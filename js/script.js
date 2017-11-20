@@ -21,7 +21,7 @@ $(document).ready(function(){
                             '<div class="well">'+
                                 "<div class='row'>"+
                                     '<div class="col-xs-6">'+question+'</div>'+
-                                    '<div class="col-xs-2" style="text-align:right;"><button type="button" class="btn btn-primary" >Antwort hinzufügen</button> </div>'+
+                                    '<div class="col-xs-2" style="text-align:right;"><button type="button" class="btn btn-primary neueAntwortBtn" id="neueAntwortBtn"  >Antwort hinzufügen</button> </div>'+
                                     '<div class="col-xs-2" style="text-align:center;"><button type="button" class="btn btn-default" >Frage Editieren</button> </div>'+
                                     '<div class="col-xs-2" style="text-align:left;"><button type="button" class="btn btn-danger" >Frage Löschen</button> </div>'+
                                 '</div>'+
@@ -41,4 +41,15 @@ $(document).ready(function(){
         
         $("#hook").append(append);
     }
+    
+    
+    
+    $("#neueAntwortBtn").on("click", function(event){
+        alert("HI");
+    });
+    
+    $(document).on("click", "#neueAntwortBtn" , function() {
+            alert("HIxxxxxx");
+    });
+    
 });
