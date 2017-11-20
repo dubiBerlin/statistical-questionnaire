@@ -1,0 +1,13 @@
+.textfeld-error {
+    border-color: #d12e2e;
+    box-shadow: 0 0 10px #d12e2e;
+}
+
+.well-child {
+    width: 100%;
+    text-align: right;
+}
+
+.neue-antwort{
+    visibility: hidden;
+}
