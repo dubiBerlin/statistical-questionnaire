@@ -60,7 +60,7 @@ $(document).ready(function(){
         var questionObj = {
             id : id,
             question: frage,
-            answers : {}
+            answers : []
         };
         return questionObj; 
     }
@@ -76,16 +76,18 @@ $(document).ready(function(){
         // check if content has been appended
         if( $("#neue-antwort"+idNr).length == 0 ){
 
-            var content = "<div class='row neue-antwort' id='neue-antwort"+idNr+"'   style='margin-top: 20px;'>"+
-                              '<div class="col-lg-6"><input type="text" class="form-control" id="txtNeueAntwort'+idNr+'"></div>'+
-                              '<div class="col-lg-3" style="text-align:right;">'+
-                                  '<button type="button" class="btn btn-default btn-sm anwortSpeichernBtnCl" id="anwortSpeichernBtn'+idNr+'" >'+
-                                      '<span class="glyphicon glyphicon-ok"></span> Speichern'+
-                                  '</button>'+
-                              '</div>'+
-                              '<div class="col-lg-3" style="text-align:left;">'+
-                                  '<button type="button" class="close" id="close'+idNr+'"  aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
-                              '</div>'+
+            var content = "<div id='neue-antwort"+idNr+"'   style='margin-top: 20px;'>"+
+                              "<div class='row' >"+
+                                  '<div class="col-lg-10"><input type="text" class="form-control" id="txtNeueAntwort'+idNr+'"></div>'+
+                                  '<div class="col-lg-2" style="text-align:left;">'+
+                                      '<button type="button" class="close" id="close'+idNr+'"  aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+                                  '</div>'+
+                              "</div>"+
+                              "<div class='row' style='margin-top:5px' >"+
+                                '<div class="col-lg-12" style="text-align:left;">'+
+                                      '<button type="button" class="btn btn-default btn-sm anwortSpeichernBtnCl" id="anwortSpeichernBtn'+idNr+'" >Antwort speichern</button>'+
+                                '</div>'+
+                              "</div>"+        
                           "</div>";
 
             $("#well"+idNr).append(content);
@@ -124,11 +126,53 @@ $(document).ready(function(){
         
         var idNr = this.id.replace("anwortSpeichernBtn", "");
         
-        alert("Speichern Kollege "+idNr);
+        
+        var newAnswer = $("#txtNeueAntwort"+idNr).val();
+        
+        
+        if(newAnswer!==""){
+            
+            // We check if answer exists for the answer
+            var pos = answerExists(newAnswer, idNr); 
+            
+            if( pos === -1 ){
+               questions[idNr].answers.push(newAnswer);
+                alert("Neue Antwort: "+newAnswer);
+            }else{
+                alert("Anwrto wurde schon hinzugefügt");
+            }   
+        }
+        
+        
+        
+        
+        var content = "<div id='antwortenblock"+idNr+"'>"+
+                        "<div class='row'>"+
+                            "<div class='col-lg-2'>"+
+                                ""
+                            "</div>"+
+                        "</div>"+
+                      "</div>";
         
     });
+     
     
-    
+    /*
+     * checks if answer exists for question
+     */
+    function answerExists(answer, id){
+        for(var i = 0; i < questions.length; i++){
+            if(questions[i].id==id){
+                for(var j = 0; j < questions[i].answers.length; j++){
+                    if(questions[i].answers[j]==answer){
+                       return i;    
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+        
     
     /*********************************
      *        HELPER FUNCTIONS       *
