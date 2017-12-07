@@ -5,6 +5,7 @@ $(document).ready(function(){
     var answers = new Array();
     
     
+    
 	$("#frageSpeichernBtn").click(function(e){
 
 		var question = $("#nameTxtField").val();
@@ -12,7 +13,23 @@ $(document).ready(function(){
 	    	if(!checkIfQuestionExists(question)){
                $("#nameTxtField").removeClass("textfeld-error");
                 appendQuestion(question);
+                
+                localStorage.setItem("","");
+                
                 $("#nameTxtField").val("");
+                
+                
+                //
+                îf(localStorage){
+                    if(localStorage.getItem("idCount")!==null){
+                        var idCount = localStorage.getItem("idCount");
+                    }else{
+                        
+                    }
+                }
+                
+                
+                
             }else{
                 alert("Frage existiert schon")
             }
@@ -25,16 +42,34 @@ $(document).ready(function(){
     
     function appendQuestion(question){
         
-        var append = "<div class='row' id='neueFrageZeile"+numberOfQuestions+"' >"+
-                            '<div class="well" id="well'+numberOfQuestions+'" >'+
+        var append = "<div class='row well' id='neueFrageZeile"+numberOfQuestions+"' style='margin-top:50px;background-color:white'  >"+
+                            '<div class="well" id="well'+numberOfQuestions+'"  style="background-color:white; border-style:none;"  >'+
+                                "<div class='row'><div class='col-lg-12'  style='text-align:left;' >Frage:</div></div> "+
                                 "<div class='row'>"+
-                                    '<div class="col-xs-6">'+question+'</div>'+
+                                    '<div class="col-xs-6" style="font-weight:bold">'+question+'</div>'+
                                     '<div class="col-xs-2" style="text-align:right;"><button type="button" class="btn btn-default neueAntwortBtnCl" id="neueAntwortBtn'+numberOfQuestions+'"  >Antwort hinzufügen</button> </div>'+
                                     '<div class="col-xs-2" style="text-align:center;"><button type="button" class="btn btn-default frageEditBtnCl" id="frageEditBtn'+numberOfQuestions+'" >Frage Editieren</button> </div>'+ 
                                     '<div class="col-xs-2" style="text-align:left;"><button type="button" class="btn btn-danger frageDelBtnCl"  id="frageDelBtn'+numberOfQuestions+'"  >Frage Löschen</button> </div>'+
                                 '</div>'+
                             '</div>'+
+                           "<table class='table'> "+    
+                                "<thead>"+
+                                    "<tr>"+
+                                        "<th>Antwort</th>"+
+                                        "<th>Eingabe</th>"+
+                                        "<th>Gesamt</th>"+
+                                        "<th>Löschen</th>"+
+                                    "</tr>"+
+                                "</thead>"+
+                                "<tbody id='tabelle"+numberOfQuestions+"' >"+
+                                "</tbody>"+
+                            "</table>"+
     	              "</div>";
+        
+        
+                        
+            
+                    
         $("#hook").append(append);
         
         questions.push(createQuestionObject(question, numberOfQuestions));
@@ -120,7 +155,10 @@ $(document).ready(function(){
         
     });
     
-    
+    /*
+     * Fügt neue Antwort für die Frage hinzu
+     *
+     */ 
     $(document).on("click", ".anwortSpeichernBtnCl" , function() {
         var id = this.id;
         
@@ -137,22 +175,37 @@ $(document).ready(function(){
             
             if( pos === -1 ){
                questions[idNr].answers.push(newAnswer);
-                alert("Neue Antwort: "+newAnswer);
+                
+                
+                
+                /*var content = "<div id='antwortenblock"+idNr+"'>"+
+                                "<div class='row'>"+
+                                    "<div class='col-lg-2'>"+
+                                        newAnswer+
+                                    "</div>"+
+                                    "<div class='col-lg-2'>"+
+                                        ""+
+                                    "</div>"+
+                                "</div>"+
+                              "</div>";*/
+                
+                var content = "<tr>"+
+                                "<td>"+newAnswer+"</td>"+
+                                "<td>"+"<textarea rows='1' id='"+pos+"' style='resize:none; width:70px; height:30px;'  class=\"form-control\"  ></textarea></td>"+
+                                "<td>"+"<textarea rows='1' id='"+pos+"'   style='resize:none; width:150px; height:30px;'  class=\"form-control\"  ></textarea></td>"+
+                                '<td> <button type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span></button></td>'+
+                              "</tr>";
+                
+                $("#tabelle"+idNr).append(content);
+                
             }else{
-                alert("Anwrto wurde schon hinzugefügt");
+                alert("Antwort wurde schon hinzugefügt");
             }   
         }
         
         
         
         
-        var content = "<div id='antwortenblock"+idNr+"'>"+
-                        "<div class='row'>"+
-                            "<div class='col-lg-2'>"+
-                                ""
-                            "</div>"+
-                        "</div>"+
-                      "</div>";
         
     });
      
