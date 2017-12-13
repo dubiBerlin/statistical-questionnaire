@@ -8,10 +8,18 @@ $(document).ready(function(){
     
     init();
     
+    
     function init(){
         
         for(var i = 0; i < localStorage.length; i++){
-            appendQuestion(localStorage.key(i), i);
+            
+            var questionObj = JSON.parse(localStorage.getItem(localStorage.key(i)));
+            
+            fnc_appendQuestion(questionObj.question, i);
+            
+            for(var j = 0; j < questionObj.answers.length; j++){
+                fnc_appendAnswer(questionObj.answers[j].answer, i);    
+            }
         }
         
     }
@@ -21,16 +29,18 @@ $(document).ready(function(){
         //localStorage.clear();
         
 		var question = $("#nameTxtField").val();
-            printLocalStorage(question);
+            fnc_printLocalStorage(question);
         
 	    if(question!==""){                
 
             if(localStorage){
                 if(localStorage.getItem(question)==null){
-                    localStorage.setItem(question, createQuestionObjLS(question));
+                    localStorage.setItem(question, JSON.stringify(fnc_createQuestionObjLS(question)));
                     $("#nameTxtField").removeClass("textfeld-error");
                     $("#nameTxtField").val("");
-                    alert("DOES not EXIST");
+                    
+                    var questionObj = JSON.parse(localStorage.getItem(question)); 
+                    fnc_appendQuestion(questionObj.question, localStorage.length-1);
                 }else{
 
                     alert("Die Frage : "+question+" existiert schon!");
@@ -43,7 +53,7 @@ $(document).ready(function(){
 	});
     
     
-    function appendQuestion(question, numberOfQuestions){
+    function fnc_appendQuestion(question, numberOfQuestions){
         
         var append = "<div class='row well' id='neueFrageZeile"+numberOfQuestions+"' style='margin-top:50px;background-color:white'  >"+
                             '<div class="well" id="well'+numberOfQuestions+'"  style="background-color:white; border-style:none;"  >'+
@@ -68,38 +78,47 @@ $(document).ready(function(){
                                 "</tbody>"+
                             "</table>"+
     	              "</div>";
-        
-        
-                        
-            
                     
         $("#hook").append(append);
         
-        questions.push(createQuestionObject(question, numberOfQuestions));
-        numberOfQuestions++;
-        printQuestions();
+        //questions.push(createQuestionObject(question, numberOfQuestions));
+        //numberOfQuestions++;
+        //printQuestions();
         //$.getScript("js/script2.js");
     }
     
     
     
-    
-    /* */
-    function printLocalStorage(question){
-        
-        console.log("______________"+localStorage.length)
-        
-        for(var i = 0; i < localStorage.length; i++){
-            if(localStorage.key(i)!==null){
-               var frage = localStorage.getItem(localStorage.key(i));
-               var key = localStorage.key(i);
+    function fnc_appendAnswer(answer, idNr){
+        var content = "<tr>"+
+                        "<td>"+answer+"</td>"+
+                        "<td>"+"<textarea rows='1' id='"+idNr+"' style='resize:none; width:70px; height:30px;'  class=\"form-control\"  ></textarea></td>"+
+                        "<td>"+"<textarea rows='1' id='"+idNr+"'   style='resize:none; width:150px; height:30px;'  class=\"form-control\"  ></textarea></td>"+
+                        '<td> <button type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span></button></td>'+
+                      "</tr>";
                 
-                console.log(i+") "+key+" : "+frage);
-            }
-        }
+        $("#tabelle"+idNr).append(content);
     }
     
-    function createQuestionObjLS(frage){
+    
+    
+    
+    
+    /********************************************************
+     *                                                      *
+     *             Localstorage Funktionen                  *
+     *                                                      *
+     ********************************************************/
+    
+    
+    
+    /* name      : fnc_createQuestionObjLS
+       purpose   : When we save a new question, we save the question
+                   as an object which contains the question itself and 
+                   an array of the proper answers. An answer is an object too 
+                   and will be added later by the user.
+       parameters: frage : string -> the question which is an user input  */
+    function fnc_createQuestionObjLS(frage){
         var questionObj = {
             question: frage,
             answers : []
@@ -107,29 +126,46 @@ $(document).ready(function(){
         return questionObj; 
     }
     
-    function checkIfQuestionExists(question){
-        for(var i = 0; i < questions.length; i++){
-            if(questions[i].question===question){
-               return true;
+    /* name      : fnc_createAnswerObjLS
+       purpose   : When we save a new answer, we save the answer
+                   as an object which contains the answer itself and the
+                   number of points. 
+       parameters: frage : string => the answer which is an user input  */
+    function fnc_createAnswerObjLS(antwort){
+        var answerObj = {
+            answer : antwort,
+            points : 0
+        }
+        return answerObj;
+    }
+    
+    
+    
+    function fnc_answerExistsLS(answer, idNr){
+        console.log("fnc_answerExistsLS "+answer+" "+idNr);
+        
+        
+        var key = localStorage.key(idNr);
+        
+        console.log("key: "+key);
+        
+        var questionObj = JSON.parse(localStorage.getItem(key));
+        
+        // Walk through the question object and search for the answer
+        for(var i = 0; i < questionObj.answers.length; i++){
+            if(questionObj.answers[i].answer===answer){
+                key = "";
             }
         }
-        return false;
-    }
-    
-    function checkIfQuestionExistsV2(question){
-        return questions.indexOf(questionObj.question===question);
-    }
-    
-    function createQuestionObject(frage, id){
-        var questionObj = {
-            id : id,
-            question: frage,
-            answers : []
-        };
-        return questionObj; 
+        return key;
     }
     
     
+    function fnc_saveAnswerLS(key, answer){
+        var questionObj = JSON.parse( localStorage.getItem(key) );
+        questionObj.answers.push(fnc_createAnswerObjLS(answer));
+        localStorage.setItem(key, JSON.stringify(questionObj));
+    }
     
     
     /* events for dynamic created content */
@@ -200,12 +236,20 @@ $(document).ready(function(){
         if(newAnswer!==""){
             
             // We check if answer exists for the answer
-            var pos = answerExists(newAnswer, idNr); 
+            //var pos = answerExists(newAnswer, idNr); 
+             var pos = 1;
+            //if( pos === -1 ){
+            fnc_printLocalStorage();
+            var key = fnc_answerExistsLS(newAnswer, idNr);
+            alert(key);
+            if(key!==""){
+                fnc_printProperAnswers(key);   
+            }
             
-            if( pos === -1 ){
-               questions[idNr].answers.push(newAnswer);
-                
-                
+            if(key!== ""){
+               //questions[idNr].answers.push(newAnswer);
+                fnc_saveAnswerLS(key, newAnswer);
+                fnc_printProperAnswers(key);
                 
                 /*var content = "<div id='antwortenblock"+idNr+"'>"+
                                 "<div class='row'>"+
@@ -218,23 +262,19 @@ $(document).ready(function(){
                                 "</div>"+
                               "</div>";*/
                 
-                var content = "<tr>"+
+                /*var content = "<tr>"+
                                 "<td>"+newAnswer+"</td>"+
                                 "<td>"+"<textarea rows='1' id='"+pos+"' style='resize:none; width:70px; height:30px;'  class=\"form-control\"  ></textarea></td>"+
                                 "<td>"+"<textarea rows='1' id='"+pos+"'   style='resize:none; width:150px; height:30px;'  class=\"form-control\"  ></textarea></td>"+
                                 '<td> <button type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-remove"></span></button></td>'+
                               "</tr>";
                 
-                $("#tabelle"+idNr).append(content);
-                
+                $("#tabelle"+idNr).append(content);*/
+                fnc_appendAnswer(newAnswer, idNr); 
             }else{
                 alert("Antwort wurde schon hinzugefügt");
             }   
         }
-        
-        
-        
-        
         
     });
      
@@ -254,11 +294,60 @@ $(document).ready(function(){
         }
         return -1;
     }
+    
+    
         
     
     /*********************************
      *        HELPER FUNCTIONS       *
      *********************************/
+    
+    
+    function fnc_printLocalStorage(question){
+        
+        console.log("______________fnc_printLocalStorage__"+localStorage.length);
+        
+        for(var i = 0; i < localStorage.length; i++){
+            if(localStorage.key(i)!==null){
+               var frage = JSON.parse(localStorage.getItem(localStorage.key(i)));
+               var key = localStorage.key(i);
+                
+                console.log(i+") "+key+" : "+frage.question);
+            }
+        }
+    }
+    
+    function fnc_printProperAnswers(key){
+        var questionObj = JSON.parse(localStorage.getItem(key));
+        
+        console.log("______________fnc_printProperAnswers__for__key: "+key+"  ===  "+questionObj.question);
+        
+        
+        for(var i = 0; i < questionObj.answers.length; i++){
+            console.log(questionObj.answers[i].answer);
+        }
+    }
+    
+    
+    
+    
+        
+    
+    /******************************
+     *                            *
+     *          OLD STUFF         *
+     *                            *
+     ******************************/
+    
+    /*function checkIfQuestionExists(question){
+        for(var i = 0; i < questions.length; i++){
+            if(questions[i].question===question){
+               return true;
+            }
+        }
+        return false;
+    }
+    
     
     function printQuestions(){
         console.log("***____printQuestions()___***");
@@ -266,6 +355,39 @@ $(document).ready(function(){
             console.log(questions[i].id+" : "+questions[i].question);
         }
     }
+    
+    function checkIfQuestionExistsV2(question){
+        return questions.indexOf(questionObj.question===question);
+    }
+    
+    function createQuestionObject(frage, id){
+        var questionObj = {
+            id : id,
+            question: frage,
+            answers : []
+        };
+        return questionObj; 
+    }
+    
+    
+    /*
+     * checks if answer exists for question
+     */
+    /*function answerExists(answer, id){
+        for(var i = 0; i < questions.length; i++){
+            if(questions[i].id==id){
+                for(var j = 0; j < questions[i].answers.length; j++){
+                    if(questions[i].answers[j]==answer){
+                       return i;    
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+    
+    
+    */
     
     
     
