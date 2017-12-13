@@ -1,37 +1,40 @@
 $(document).ready(function(){
 	
-    var numberOfQuestions = 0;
+    //var numberOfQuestions = 0;
     var questions = [];
     var answers = new Array();
     
+    var idCount = "idCount";
     
+    init();
+    
+    function init(){
+        
+        for(var i = 0; i < localStorage.length; i++){
+            appendQuestion(localStorage.key(i), i);
+        }
+        
+    }
     
 	$("#frageSpeichernBtn").click(function(e){
-
+            
+        //localStorage.clear();
+        
 		var question = $("#nameTxtField").val();
-	    if(question!==""){
-	    	if(!checkIfQuestionExists(question)){
-               $("#nameTxtField").removeClass("textfeld-error");
-                appendQuestion(question);
-                
-                localStorage.setItem("","");
-                
-                $("#nameTxtField").val("");
-                
-                
-                //
-                îf(localStorage){
-                    if(localStorage.getItem("idCount")!==null){
-                        var idCount = localStorage.getItem("idCount");
-                    }else{
-                        
-                    }
-                }
-                
-                
-                
-            }else{
-                alert("Frage existiert schon")
+            printLocalStorage(question);
+        
+	    if(question!==""){                
+
+            if(localStorage){
+                if(localStorage.getItem(question)==null){
+                    localStorage.setItem(question, createQuestionObjLS(question));
+                    $("#nameTxtField").removeClass("textfeld-error");
+                    $("#nameTxtField").val("");
+                    alert("DOES not EXIST");
+                }else{
+
+                    alert("Die Frage : "+question+" existiert schon!");
+                }  
             }
             
 	    }else {
@@ -40,7 +43,7 @@ $(document).ready(function(){
 	});
     
     
-    function appendQuestion(question){
+    function appendQuestion(question, numberOfQuestions){
         
         var append = "<div class='row well' id='neueFrageZeile"+numberOfQuestions+"' style='margin-top:50px;background-color:white'  >"+
                             '<div class="well" id="well'+numberOfQuestions+'"  style="background-color:white; border-style:none;"  >'+
@@ -76,6 +79,32 @@ $(document).ready(function(){
         numberOfQuestions++;
         printQuestions();
         //$.getScript("js/script2.js");
+    }
+    
+    
+    
+    
+    /* */
+    function printLocalStorage(question){
+        
+        console.log("______________"+localStorage.length)
+        
+        for(var i = 0; i < localStorage.length; i++){
+            if(localStorage.key(i)!==null){
+               var frage = localStorage.getItem(localStorage.key(i));
+               var key = localStorage.key(i);
+                
+                console.log(i+") "+key+" : "+frage);
+            }
+        }
+    }
+    
+    function createQuestionObjLS(frage){
+        var questionObj = {
+            question: frage,
+            answers : []
+        };
+        return questionObj; 
     }
     
     function checkIfQuestionExists(question){
