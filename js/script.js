@@ -24,9 +24,13 @@ $(document).ready(function(){
         
     }
     
+    $("#deleteAllBtn").click(function(e){
+       localStorage.clear();
+	});
+    
 	$("#frageSpeichernBtn").click(function(e){
             
-        //localStorage.clear();
+        
         
 		var question = $("#nameTxtField").val();
             fnc_printLocalStorage();
