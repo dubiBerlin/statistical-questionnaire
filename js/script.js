@@ -29,7 +29,7 @@ $(document).ready(function(){
         //localStorage.clear();
         
 		var question = $("#nameTxtField").val();
-            fnc_printLocalStorage(question);
+            fnc_printLocalStorage();
         
 	    if(question!==""){                
 
@@ -41,6 +41,7 @@ $(document).ready(function(){
                     
                     var questionObj = JSON.parse(localStorage.getItem(question)); 
                     fnc_appendQuestion(questionObj.question, localStorage.length-1);
+                    fnc_printLocalStorage();
                 }else{
 
                     alert("Die Frage : "+question+" existiert schon!");
@@ -59,7 +60,7 @@ $(document).ready(function(){
                             '<div class="well" id="well'+numberOfQuestions+'"  style="background-color:white; border-style:none;"  >'+
                                 "<div class='row'><div class='col-lg-12'  style='text-align:left;' >Frage:</div></div> "+
                                 "<div class='row'>"+
-                                    '<div class="col-xs-6" style="font-weight:bold">'+question+'</div>'+
+                                    '<div id="title'+numberOfQuestions+'" class="col-xs-6" style="font-weight:bold">'+question+'</div>'+
                                     '<div class="col-xs-2" style="text-align:right;"><button type="button" class="btn btn-default neueAntwortBtnCl" id="neueAntwortBtn'+numberOfQuestions+'"  >Antwort hinzufügen</button> </div>'+
                                     '<div class="col-xs-2" style="text-align:center;"><button type="button" class="btn btn-default frageEditBtnCl" id="frageEditBtn'+numberOfQuestions+'" >Frage Editieren</button> </div>'+ 
                                     '<div class="col-xs-2" style="text-align:left;"><button type="button" class="btn btn-danger frageDelBtnCl"  id="frageDelBtn'+numberOfQuestions+'"  >Frage Löschen</button> </div>'+
@@ -141,23 +142,18 @@ $(document).ready(function(){
     
     
     
-    function fnc_answerExistsLS(answer, idNr){
-        console.log("fnc_answerExistsLS "+answer+" "+idNr);
-        
-        
-        var key = localStorage.key(idNr);
-        
-        console.log("key: "+key);
+    function fnc_answerExistsLS(answer, key){
+        console.log("fnc_answerExistsLS "+answer+" "+key);
         
         var questionObj = JSON.parse(localStorage.getItem(key));
         
         // Walk through the question object and search for the answer
         for(var i = 0; i < questionObj.answers.length; i++){
             if(questionObj.answers[i].answer===answer){
-                key = "";
+                return true;
             }
         }
-        return key;
+        return false;
     }
     
     
@@ -237,16 +233,11 @@ $(document).ready(function(){
             
             // We check if answer exists for the answer
             //var pos = answerExists(newAnswer, idNr); 
-             var pos = 1;
-            //if( pos === -1 ){
+             
             fnc_printLocalStorage();
-            var key = fnc_answerExistsLS(newAnswer, idNr);
-            alert(key);
-            if(key!==""){
-                fnc_printProperAnswers(key);   
-            }
+            var key = $("#title"+idNr).text();
             
-            if(key!== ""){
+            if(fnc_answerExistsLS(newAnswer, key)!==true){
                //questions[idNr].answers.push(newAnswer);
                 fnc_saveAnswerLS(key, newAnswer);
                 fnc_printProperAnswers(key);
@@ -303,7 +294,7 @@ $(document).ready(function(){
      *********************************/
     
     
-    function fnc_printLocalStorage(question){
+    function fnc_printLocalStorage(){
         
         console.log("______________fnc_printLocalStorage__"+localStorage.length);
         
